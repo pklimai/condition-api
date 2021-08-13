@@ -1,4 +1,4 @@
-package api.condition.nica.npm.mipt.ru
+package ru.mipt.npm.nica.condition.api
 
 import io.ktor.features.*
 import io.ktor.routing.*
@@ -9,7 +9,6 @@ import io.ktor.response.*
 import io.ktor.request.*
 import kotlin.test.*
 import io.ktor.server.testing.*
-import api.condition.nica.npm.mipt.ru.plugins.*
 
 class ApplicationTest {
     @Test
