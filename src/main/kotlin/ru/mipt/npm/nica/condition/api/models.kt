@@ -20,11 +20,9 @@ class RunPeriod(id: EntityID<Int>) : Entity<Int>(id) {
     val start_datetime by RunPeriods.start_datetime
     val end_datetime by RunPeriods.end_datetime
 
-    fun asSerializable() = SerializableRunPeriod(
-        this.id.value,
-        this.start_datetime.toString(),
-        this.end_datetime.toString()
-    )
+    fun asSerializable() = with(this) {
+        SerializableRunPeriod(id.value, start_datetime.toString(), end_datetime.toString())
+    }
 }
 
 @Serializable

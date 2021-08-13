@@ -8,7 +8,7 @@ import io.ktor.request.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Application.configureSerialization() {
+fun Application.configureAPIRouting() {
     install(ContentNegotiation) {
         json()
     }
