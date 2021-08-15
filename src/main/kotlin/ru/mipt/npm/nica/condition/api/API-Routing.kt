@@ -6,7 +6,10 @@ import io.ktor.application.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.between
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.greaterEq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
 import org.jetbrains.exposed.sql.transactions.transaction
 
 val API_ROOT_URL = "/unidb-api/v1"
@@ -19,6 +22,7 @@ fun Application.configureAPIRouting() {
     routing {
         route(API_ROOT_URL) {
 
+            // Plural - returns all
             get("/period_numbers") {
                 val res = ArrayList<SerializableRunPeriod>()
                 transaction {
@@ -29,6 +33,7 @@ fun Application.configureAPIRouting() {
                 call.respond(res)
             }
 
+            // Single - return one
             get("/period_number/{period_number}") {
                 val intPeriodNumber = call.parameters["period_number"]!!.toIntOrNull()
                 if (intPeriodNumber == null) {
@@ -36,67 +41,59 @@ fun Application.configureAPIRouting() {
                 } else {
                     var periodNumber: SerializableRunPeriod? = null
                     transaction {
-                        periodNumber = RunPeriods.select(RunPeriods.period_number.eq(intPeriodNumber)).first().toSerializableRunPeriod()
+                        periodNumber = RunPeriods.select(RunPeriods.period_number.eq(intPeriodNumber)).first()
+                            .toSerializableRunPeriod()
                     }
                     call.respond(periodNumber ?: "Not found in DB")
                 }
             }
 
-            get("/runs-all") {
-                val res = ArrayList<SerializableRun>()
-                transaction {
-                    Runs.selectAll().forEach {
-                        res.add(it.toSerializableRun())
-                    }
-                }
-                call.respond(res)
-            }
-
-            get("/runs/{period_number}/{run_number}") {
+            // Single - returns one
+            get("/run/{period_number}/{run_number}") {
                 val period_number = call.parameters["period_number"]!!.toInt()
                 val run_number = call.parameters["run_number"]!!.toInt()
-                val res = ArrayList<SerializableRun>()
+                var res: SerializableRun? = null
                 transaction {
-                    Runs.select(
-                        Runs.period_number.eq(period_number) and Runs.run_number.eq(run_number)
-                    ).forEach {
-                        res.add(it.toSerializableRun())
-                    }
+                    res = Runs.select(Runs.period_number.eq(period_number) and Runs.run_number.eq(run_number))
+                        .first().toSerializableRun()
                 }
-                // shall it be a list or just one object?
-                call.respond(res)
+                if (res != null) {
+                    call.respond(res!!)
+                }
             }
 
+            // Plural - return multiple with search
+            // Shall we return all when no criteria specified?
             get("/runs") {
+                val ops = ArrayList<Op<Boolean>>()
+                intParameterOperation(call.parameters["period_number"], Runs.period_number)?.let { ops.add(it) }
+                intParameterOperation(call.parameters["run_number"], Runs.run_number)?.let { ops.add(it) }
+                // file_path
+                stringParameterOperation(call.parameters["beam_particle"], Runs.beam_particle)?.let { ops.add(it) }
+                stringParameterOperation(call.parameters["target_particle"], Runs.target_particle)?.let { ops.add(it) }
+                doubleParameterOperation(call.parameters["energy"], Runs.energy)?.let { ops.add(it) }
+                // start_datetime
+                // end_datetime
+                intParameterOperation(call.parameters["event_count"], Runs.event_count)?.let { ops.add(it) }
+                doubleParameterOperation(call.parameters["field_voltage"], Runs.field_voltage)?.let { ops.add(it) }
+                longParameterOperation(call.parameters["file_size"], Runs.file_size)?.let { ops.add(it) }
+                intParameterOperation(call.parameters["geometry_id"], Runs.geometry_id)?.let { ops.add(it) }
+                // file_md5
 
-                var op: Op<Boolean>? = null
-//                var ops = ArrayList<Op<Boolean>>()
-//
-//                fun getIntParameterOperation(strParamValue: String): Op<Boolean> {
-//
-//                }
-
-                val period_number = call.parameters["period_number"]?.toInt()
-                if (period_number != null) {
-                    op = Runs.period_number.eq(period_number)
-                }
-
-                val run_number = call.parameters["run_number"]?.toInt()
-                if (run_number != null) {
-                    val addOp = Runs.run_number.eq(run_number)
-                    if (op == null) {
-                        op = addOp
-                    } else {
-                        op = op and addOp
-                    }
-                }
-
-                // TODO...
-
-                if (op != null) {
+                if (ops.isNotEmpty()) {
+                    val op = ops.reduce { a, b -> a and b }
                     val res = ArrayList<SerializableRun>()
                     transaction {
                         Runs.select(op).forEach {
+                            res.add(it.toSerializableRun())
+                        }
+                    }
+                    call.respond(res)
+                } else {
+                    // Return all - shall we do it?
+                    val res = ArrayList<SerializableRun>()
+                    transaction {
+                        Runs.selectAll().forEach {
                             res.add(it.toSerializableRun())
                         }
                     }
