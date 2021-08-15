@@ -2,7 +2,7 @@ package ru.mipt.npm.nica.condition.api
 
 import org.jetbrains.exposed.sql.ResultRow
 
-fun ResultRow.toSerializableRun() = SerializableRun(
+fun ResultRow.toRun() = Run(
     period_number = this[Runs.period_number],
     run_number = this[Runs.run_number],
     file_path = this[Runs.file_path],
@@ -18,7 +18,7 @@ fun ResultRow.toSerializableRun() = SerializableRun(
     file_md5 = this[Runs.file_md5]
 )
 
-fun ResultRow.toSerializableRunPeriod() = SerializableRunPeriod(
+fun ResultRow.toRunPeriod() = RunPeriod(
     period_number = this[RunPeriods.period_number],
     start_datetime = this[RunPeriods.start_datetime].toString(),
     end_datetime = this[RunPeriods.end_datetime].toString()

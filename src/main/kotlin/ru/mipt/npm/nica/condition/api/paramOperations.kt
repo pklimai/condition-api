@@ -11,6 +11,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.lessEq
  Following functions create SQL operation from string parameter value.
  Can include ranges (x-y), greater-or-equal (x+), less-or-equal(x-)
  Note: 'in' fixes optional columns
+ Note: '+' in URL is encoded as Space, so we match both
 */
 fun intParameterOperation(strParamValue: String?, col: Column<in Int>): Op<Boolean>? {
     if (strParamValue.isNullOrEmpty()) return null
@@ -18,7 +19,7 @@ fun intParameterOperation(strParamValue: String?, col: Column<in Int>): Op<Boole
         val x = strParamValue.slice(0..strParamValue.length - 2).toInt()
         return col.lessEq(x)
     }
-    if (strParamValue.last() == '+') {
+    if (strParamValue.last() in setOf('+', ' ')) {
         val x = strParamValue.slice(0..strParamValue.length - 2).toInt()
         return col.greaterEq(x)
     }
@@ -40,7 +41,7 @@ fun doubleParameterOperation(strParamValue: String?, col: Column<in Double>): Op
         val x = strParamValue.slice(0..strParamValue.length - 2).toDouble()
         return col.lessEq(x)
     }
-    if (strParamValue.last() == '+') {
+    if (strParamValue.last() in setOf('+', ' ')) {
         val x = strParamValue.slice(0..strParamValue.length - 2).toDouble()
         return col.greaterEq(x)
     }
@@ -62,7 +63,7 @@ fun longParameterOperation(strParamValue: String?, col: Column<in Long>): Op<Boo
         val x = strParamValue.slice(0..strParamValue.length - 2).toLong()
         return col.lessEq(x)
     }
-    if (strParamValue.last() == '+') {
+    if (strParamValue.last() in setOf('+', ' ')) {
         val x = strParamValue.slice(0..strParamValue.length - 2).toLong()
         return col.greaterEq(x)
     }

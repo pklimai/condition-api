@@ -3,7 +3,6 @@ package ru.mipt.npm.nica.condition.api
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 
-
 object RunPeriods : Table("run_period") {
     val period_number = integer("period_number").primaryKey()
     val start_datetime = datetime("start_datetime")
@@ -11,7 +10,7 @@ object RunPeriods : Table("run_period") {
 }
 
 @Serializable
-data class SerializableRunPeriod(
+data class RunPeriod(
     val period_number: Int,
     val start_datetime: String,
     val end_datetime: String
@@ -34,7 +33,7 @@ object Runs : Table("run_") {
 }
 
 @Serializable
-data class SerializableRun(
+data class Run(
     val period_number: Int,
     val run_number: Int,
     val file_path: String,

@@ -1,0 +1,21 @@
+
+###
+
+GET http://127.0.0.1:8080/unidb-api/v1/runs?period_number=7&run_number=5005
+
+###
+
+POST http://127.0.0.1:8080/unidb-api/v1/period-number
+Content-Type: application/json
+
+{
+  "period_number": 8,
+  "start_datetime": "2021-03-04T01:29:20.000+03:00",
+  "end_datetime": "2021-04-05T08:30:08.000+03:00"
+}
+
+###
+
+
+
+
