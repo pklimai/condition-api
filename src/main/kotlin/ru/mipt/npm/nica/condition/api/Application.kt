@@ -17,6 +17,7 @@ fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
         configureHTTP()
         configureAPIRouting()
+        configureHomepage()
         Database.connect(URL, driver = DRIVER, user = USER, password = PASS)
         transaction {
 //            RunPeriods.selectAll().forEach {

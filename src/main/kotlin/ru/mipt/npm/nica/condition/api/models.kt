@@ -6,27 +6,27 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
 
 
-object RunPeriods : IntIdTable("run_period", "period_number") {
-    //val period_number = integer("period_number").primaryKey().entityId()
+object RunPeriods : Table("run_period") {
+    val period_number = integer("period_number").primaryKey()
     val start_datetime = datetime("start_datetime")
     val end_datetime = datetime("end_datetime")
 }
 
-class RunPeriod(period_number: EntityID<Int>) : Entity<Int>(period_number) {
-    companion object : EntityClass<Int, RunPeriod>(RunPeriods)
-
-    //val period_number by RunPeriods.period_number
-    val start_datetime by RunPeriods.start_datetime
-    val end_datetime by RunPeriods.end_datetime
-
-    fun asSerializable() = with(this) {
-        SerializableRunPeriod(id.value, start_datetime.toString(), end_datetime.toString())
-    }
-}
+//class RunPeriod(period_number: EntityID<Int>) : Entity<Int>(period_number) {
+//    companion object : EntityClass<Int, RunPeriod>(RunPeriods)
+//
+//    //val period_number by RunPeriods.period_number
+//    val start_datetime by RunPeriods.start_datetime
+//    val end_datetime by RunPeriods.end_datetime
+//
+//    fun asSerializable() = with(this) {
+//        SerializableRunPeriod(id.value, start_datetime.toString(), end_datetime.toString())
+//    }
+//}
 
 @Serializable
 data class SerializableRunPeriod(
-    val run_period: Int,
+    val period_number: Int,
     val start_datetime: String,
     val end_datetime: String
 )
@@ -46,7 +46,7 @@ data class SerializableRunPeriod(
 //}
 
 object Runs : Table("run_") {
-    val period_number = integer("period_number").primaryKey().references(RunPeriods.id)
+    val period_number = integer("period_number").primaryKey().references(RunPeriods.period_number)
     val run_number = integer("run_number").primaryKey()
     val file_path = varchar("file_path", 200).uniqueIndex()
     val beam_particle = varchar("beam_particle", 10)

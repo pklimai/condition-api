@@ -4,11 +4,12 @@ import io.ktor.serialization.*
 import io.ktor.features.*
 import io.ktor.application.*
 import io.ktor.response.*
-import io.ktor.request.*
 import io.ktor.routing.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+
+val API_ROOT_URL = "/unidb-api/v1"
 
 fun Application.configureAPIRouting() {
     install(ContentNegotiation) {
@@ -16,27 +17,28 @@ fun Application.configureAPIRouting() {
     }
 
     routing {
-        route("/unidb-api/v1") {
-            get("/run_periods") {
+        route(API_ROOT_URL) {
+
+            get("/period_numbers") {
                 val res = ArrayList<SerializableRunPeriod>()
                 transaction {
-                    RunPeriod.all().forEach {
-                        res.add(it.asSerializable())
+                    RunPeriods.selectAll().forEach {
+                        res.add(it.toSerializableRunPeriod())
                     }
                 }
                 call.respond(res)
             }
 
-            get("/run_period/{id}") {
-                val intId = call.parameters["id"]!!.toIntOrNull()
-                if (intId == null) {
+            get("/period_number/{period_number}") {
+                val intPeriodNumber = call.parameters["period_number"]!!.toIntOrNull()
+                if (intPeriodNumber == null) {
                     call.respond("Not a number input")
                 } else {
-                    var runPeriod: RunPeriod? = null
+                    var periodNumber: SerializableRunPeriod? = null
                     transaction {
-                        runPeriod = RunPeriod.findById(intId)
+                        periodNumber = RunPeriods.select(RunPeriods.period_number.eq(intPeriodNumber)).first().toSerializableRunPeriod()
                     }
-                    call.respond(runPeriod?.asSerializable() ?: "Not found in DB")
+                    call.respond(periodNumber ?: "Not found in DB")
                 }
             }
 
@@ -68,6 +70,11 @@ fun Application.configureAPIRouting() {
             get("/runs") {
 
                 var op: Op<Boolean>? = null
+//                var ops = ArrayList<Op<Boolean>>()
+//
+//                fun getIntParameterOperation(strParamValue: String): Op<Boolean> {
+//
+//                }
 
                 val period_number = call.parameters["period_number"]?.toInt()
                 if (period_number != null) {
@@ -102,18 +109,3 @@ fun Application.configureAPIRouting() {
 
 }
 
-fun ResultRow.toSerializableRun() = SerializableRun(
-    period_number = this[Runs.period_number],
-    run_number = this[Runs.run_number],
-    file_path = this[Runs.file_path],
-    beam_particle = this[Runs.beam_particle],
-    target_particle = this[Runs.target_particle],
-    energy = this[Runs.energy],
-    start_datetime = this[Runs.start_datetime].toString(),
-    end_datetime = this[Runs.end_datetime].toString(),
-    event_count = this[Runs.event_count],
-    field_voltage = this[Runs.field_voltage],
-    file_size = this[Runs.file_size],
-    geometry_id = this[Runs.geometry_id],
-    file_md5 = this[Runs.file_md5]
-)
