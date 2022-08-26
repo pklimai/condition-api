@@ -6,13 +6,15 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
-val URL = "jdbc:postgresql://192.168.65.52:5001/bmn_db"
 val DRIVER = "org.postgresql.Driver"
-val USER = "user"
-val PASS = "user_pass"
+val API_ROOT_URL = System.getenv("CDBAPI_API_ROOT_URL") ?: "/unidb-api/v1"
+val USER = System.getenv("CDBAPI_PSQL_USER") ?: "user"
+val PASS = System.getenv("CDBAPI_PSQL_PASSWORD") ?: "user_pass"
+val URL = System.getenv("CDBAPI_PSQL_URL") ?: "jdbc:postgresql://192.168.65.52:5001/bmn_db"
+val PORT = System.getenv("CDBAPI_LISTEN_PORT")?.toInt() ?: 8080
 
 fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+    embeddedServer(Netty, port = PORT, host = "0.0.0.0") {
         configureHTTP()
         configureAPIRouting()
         configureHomepage()

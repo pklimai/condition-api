@@ -9,7 +9,13 @@ and inclusive ranges (e.g. `10-15`).
 
 Search or filtering is supported for all fields, except: `file_path`, `start_datetime`, `end_datetime`, `file_md5`.
 
-### Example calls
+### Configuration
+
+Use environment variables `CDBAPI_PSQL_USER`, `CDBAPI_PSQL_PASSWORD`, `CDBAPI_PSQL_URL` 
+(such as `jdbc:postgresql://192.168.65.52:5001/bmn_db`), `CDBAPI_LISTEN_PORT`, `CDBAPI_API_ROOT_URL` 
+(such as `/unidb-api/v1`) to configure this application.
+
+### Example API calls
 
 Example with range and strings match:
 ```

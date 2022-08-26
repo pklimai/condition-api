@@ -1,6 +1,5 @@
 package ru.mipt.npm.nica.condition.api
 
-import io.ktor.serialization.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.application.*
 import io.ktor.http.*
@@ -14,9 +13,8 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.joda.time.DateTime
 
-const val API_ROOT_URL = "/unidb-api/v1"
-
 fun Application.configureAPIRouting() {
+
     install(ContentNegotiation) {
         json()
     }
@@ -127,4 +125,3 @@ fun Application.configureAPIRouting() {
     }
 
 }
-
