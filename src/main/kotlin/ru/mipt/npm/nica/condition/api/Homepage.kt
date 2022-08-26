@@ -1,9 +1,9 @@
 package ru.mipt.npm.nica.condition.api
 
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.html.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.html.*
 import kotlinx.html.*
 
 fun BODY.sampleUseWidget(header: String, url: String) {

@@ -1,12 +1,13 @@
 package ru.mipt.npm.nica.condition.api
 
 import io.ktor.serialization.*
-import io.ktor.features.*
-import io.ktor.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.application.*
 import io.ktor.http.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
